@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
+
     [SerializeField]
     private GameObject m_pauseScreen;
 
 
     private PlayerControls m_playerControls;
 
+    public int m_currentWave;
 
-    private void Awake()
+    protected override void Awake()
     {
         Time.timeScale = 1.0f;
         m_playerControls = new PlayerControls();
@@ -20,12 +22,13 @@ public class GameManager : MonoBehaviour
         m_playerControls.PlayerMovement.Pause.performed += OnPause;
 
         m_pauseScreen.SetActive(false);
+        base.Awake();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Screen Width : " + Screen.width);
+        
     }
 
     // Update is called once per frame
@@ -39,12 +42,4 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0;
         m_pauseScreen.SetActive(true);
     }
-
-    public void ResumeGame()
-    {
-        Time.timeScale = 1.0f;
-        m_pauseScreen.SetActive(false);
-    }
-
-
 }
