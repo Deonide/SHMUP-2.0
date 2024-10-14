@@ -14,6 +14,8 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerControls m_playerControls;
 
+    [SerializeField]
+    private GameObject m_health1, m_health2, m_health3;
 
     //<---  Movement    --->
     private Rigidbody2D m_rb;
@@ -22,27 +24,30 @@ public class PlayerMovement : MonoBehaviour
     private int m_Health = 3;
     public float m_Speed;
 
-
+    #region Awake
     private void Awake()
     {
         m_playerControls = new PlayerControls();
         m_playerControls.PlayerMovement.Fire.Enable();
         m_playerControls.PlayerMovement.SpecialFire.Enable();
-
         m_playerControls.PlayerMovement.Movement.Enable();
 
+        m_playerControls.PlayerMovement.SpecialFire.started += StartSpecialFire;
         m_playerControls.PlayerMovement.Fire.performed += OnFire;
         m_playerControls.PlayerMovement.SpecialFire.performed += OnSpecialFire;
 
         m_playerControls.PlayerMovement.Movement.performed += OnMove;
 
         m_playerControls.PlayerMovement.Movement.canceled += OnMoveStop;
-
+        m_playerControls.PlayerMovement.SpecialFire.canceled += CancelSpecialFire;
     }
-
+    #endregion
     void Start()
     {
         m_rb = GetComponent<Rigidbody2D>();
+        m_health1.SetActive(true); 
+        m_health2.SetActive(true);
+        m_health3.SetActive(true);
     }
 
     private void OnMove(InputAction.CallbackContext _context)
@@ -62,9 +67,19 @@ public class PlayerMovement : MonoBehaviour
         Instantiate(m_bulletPrefab, m_bulletSpawnPoint.transform.position, m_bulletSpawnPoint.transform.rotation);
     }
 
+    private void StartSpecialFire(InputAction.CallbackContext _context)
+    {
+        Debug.Log("Special shot start");
+    }
+
     private void OnSpecialFire(InputAction.CallbackContext _context)
     {
-        Debug.Log("Special shot");
+        Debug.Log("Special shot fired");
+    }
+
+    private void CancelSpecialFire(InputAction.CallbackContext _context)
+    {
+        Debug.Log("Special shot canceled");
     }
 
     public void AddHealth()
@@ -74,9 +89,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-
         m_Health -= 1;
-        print(m_Health);
+
     }
 
     void Update()
@@ -99,7 +113,17 @@ public class PlayerMovement : MonoBehaviour
             transform.position = new Vector2(leftSideOfScreenInWorld, transform.position.y);
         }
 
-        if (m_Health <= 0)
+        else if (m_Health == 2)
+        {
+            m_health3.SetActive(false);
+        }
+
+        else if (m_Health == 1)
+        {
+            m_health2.SetActive(false);
+        }
+
+        else if (m_Health <= 0)
         {
             Destroy(this.gameObject);
         }
