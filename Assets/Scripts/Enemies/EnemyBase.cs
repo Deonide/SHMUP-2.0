@@ -11,7 +11,7 @@ public class EnemyBase : MonoBehaviour
     }
 
     [SerializeField]
-    protected int m_Health;
+    protected int m_Score;
 
     [SerializeField]
     protected List<GameObject> PowerUps = new List<GameObject>();
@@ -19,19 +19,40 @@ public class EnemyBase : MonoBehaviour
     [SerializeField]
     protected GameObject m_explosion;
 
+    protected bool m_isBoss;
+
+    protected PlayerMovement m_player;
+
     protected EnemyState m_enemyState;
 
     protected Vector2 m_enemyPosition;
     protected Vector2 m_screenSpace;
-    protected int m_enemyMoves;
+    private   Vector2 m_spawnPosition;
+
+    private WaveManager m_waveManager;
+
+    protected float m_Health = 3;
 
     protected virtual void Start()
     {
         m_screenSpace = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, 0));
-        m_enemyMoves = Random.Range(1, 3);
+        m_waveManager = FindObjectOfType<WaveManager>();
+
+        //Get the screen position of object in Pixels
+        Vector2 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+
+        // Get the left and right side of the screen in world units
+        float rightSideofScreenInWorld = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height)).x;
+        float leftSideOfScreenInWorld = Camera.main.ScreenToWorldPoint(new Vector2(0f, 0f)).x;
+
+        float bottomSideOfTheScrean = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height / 2)).y;
+        float topSideOfTheScrean = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height - 4)).y;
+
+        m_spawnPosition.x = Random.Range(leftSideOfScreenInWorld, rightSideofScreenInWorld - 1);
+        m_spawnPosition.y = Random.Range(bottomSideOfTheScrean, topSideOfTheScrean -1);
+        m_player = FindObjectOfType<PlayerMovement>();
     }
 
-    #region Update
     protected virtual void Update()
     {
         m_enemyPosition = transform.position;
@@ -39,34 +60,65 @@ public class EnemyBase : MonoBehaviour
         switch (m_enemyState)
         {
             case EnemyState.Spawning:
-                if (m_enemyPosition.y > 4)
+                if (!m_isBoss)
                 {
-                    transform.position = Vector2.Lerp(transform.position, new Vector2(m_enemyPosition.x, m_enemyPosition.y - 0.5f), Time.deltaTime);
+                    if (m_enemyPosition != m_spawnPosition)
+                    {
+                        float distance = Vector2.Distance(m_enemyPosition, m_spawnPosition);
+
+                        float lerpfactor = Mathf.Clamp01(Time.deltaTime * 3 * distance);
+
+                        transform.position = Vector2.Lerp(transform.position, m_spawnPosition, lerpfactor);
+
+                        if (distance <= 0.5)
+                        {
+                            m_enemyState = EnemyState.Active;
+                        }
+                    }
                 }
+
                 else
                 {
-                    m_enemyState = EnemyState.Active;
-                }
+                    if(transform.position.y > 3.5)
+                    {
+                        transform.position = Vector2.Lerp(transform.position, new Vector2(m_enemyPosition.x, m_enemyPosition.y - 0.5f), Time.deltaTime);
+                    }
+                    else
+                    {
+                        m_enemyState = EnemyState.Active;
+                    }
+                }    
                 break;
+        }
 
+        if(m_enemyPosition.y <= -6)
+        {
+            OnDestroy();
         }
     }
-    #endregion
 
-    #region OnCollision
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Bullet"))
+        if (m_enemyState == EnemyState.Active)
         {
-            m_Health--;
-
-            if(m_Health <= 0)
+            if (collision.gameObject.CompareTag("Player"))
             {
-                Instantiate(m_explosion, new Vector3(transform.position.x, transform.position.y, 0), Quaternion.identity);
+                m_Health -= m_player.m_bulletDamage;
 
-                Destroy(gameObject);
+                if (m_Health <= 0)
+                {
+                    m_player.AddScore(m_Score);
+                    Instantiate(m_explosion, new Vector3(transform.position.x, transform.position.y, 0), Quaternion.identity);
+
+                    OnDestroy();
+                }
             }
         }
     }
-    #endregion
+    
+    private void OnDestroy()
+    {
+        m_waveManager.RemoveFromList(this.gameObject);
+        Destroy(gameObject);
+    }
 }
