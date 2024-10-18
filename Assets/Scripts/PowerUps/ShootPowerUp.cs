@@ -2,17 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShootPowerUp : MonoBehaviour
+public class ShootPowerUp : PowerUpBase
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void Activate()
     {
-        
-    }
+        if (m_player.m_bulletPowered != true) 
+        { 
+            m_player.m_bulletPowered = true;
+        }
+      
+        else if (m_player.m_bulletUltra != true && m_player.m_bulletPowered == true)
+        {
+            m_player.m_bulletUltra = true;
+            m_player.m_bulletPowered = false;
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Destroy(gameObject);
     }
 }

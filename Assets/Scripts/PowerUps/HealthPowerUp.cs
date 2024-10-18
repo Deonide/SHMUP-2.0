@@ -2,17 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HealthPowerUp : MonoBehaviour
+public class HealthPowerUp : PowerUpBase
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void Activate()
     {
-        
-    }
+        m_player.m_Health = 3;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        m_player.m_health2.SetActive(true);
+        m_player.m_health3.SetActive(true);
     }
 }

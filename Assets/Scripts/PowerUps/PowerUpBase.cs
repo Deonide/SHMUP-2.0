@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class PowerUpBase : MonoBehaviour
 {
-    // Start is called before the first frame update
+    protected PlayerMovement m_player;
+
+
     void Start()
     {
-        
+        m_player = FindObjectOfType<PlayerMovement>();
     }
 
-    // Update is called once per frame
-    void Update()
+
+    public virtual void Activate()
     {
-        
+        Destroy(gameObject);
     }
 }
