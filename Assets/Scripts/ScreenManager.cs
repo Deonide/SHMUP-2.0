@@ -5,9 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class ScreenManager : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject m_pauseScreen;
-
     public void GoToGameScene()
     {
         SceneManager.LoadScene("Main");
@@ -16,11 +13,5 @@ public class ScreenManager : MonoBehaviour
     public void GoToMainMenu()
     {
         SceneManager.LoadScene("Main Menu");
-    }
-
-    public void ResumeGame()
-    {
-        Time.timeScale = 1.0f;
-        m_pauseScreen.SetActive(false);
     }
 }
