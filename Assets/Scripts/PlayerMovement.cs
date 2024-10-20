@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -9,15 +10,32 @@ using UnityEngine.SceneManagement;
 public class PlayerMovement : MonoBehaviour
 {
     #region Variables
-    [SerializeField]
-    private GameObject m_bulletPrefab, m_bulletPrefabPower, m_bulletPrefabUltra;
-
+    [Header("Bullets")]
     [SerializeField]
     private GameObject m_bulletSpawnPoint;
 
     [SerializeField]
-    public GameObject m_health1, m_health2, m_health3;
+    private GameObject m_bulletPrefab, m_bulletPrefabPower, m_bulletPrefabUltra;
 
+    public int m_bulletDamage;
+    public bool m_bulletPowered, m_bulletUltra;
+
+    [Header("Health & Shields")]
+
+    public GameObject m_health1;
+    public GameObject m_health2, m_health3, m_shield, m_shield2, m_shield3;
+    
+    public int m_Health = 3;
+    public int m_shieldsAmount;
+
+    public bool m_shielded;
+
+    [Header("Special Attack")]
+    public GameObject m_Special;
+    public GameObject m_Special2, m_Special3, m_Special4;
+    public int m_specialAttackCount;
+
+    [Header("Other")]
     [SerializeField]
     private GameObject m_pauseScreen;
 
@@ -25,14 +43,15 @@ public class PlayerMovement : MonoBehaviour
     private TextMeshProUGUI m_scoreText;
 
     private PlayerControls m_playerControls;
+    private WaveManager m_waveManager;
+
     //<---  Movement    --->
     private Rigidbody2D m_rb;
 
     //<-- Changeable variables -->
-    public int m_Health = 3;
-    public int m_bulletDamage;
-    public bool m_bulletPowered, m_bulletUltra;
+    public float m_fuel;
     public float m_Speed;
+
 #endregion
     #region Start Game
     private void Awake()
@@ -56,11 +75,27 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         m_rb = GetComponent<Rigidbody2D>();
+        m_waveManager = FindObjectOfType<WaveManager>();
+        m_fuel = 100;
+
 
         m_health1.SetActive(true); 
         m_health2.SetActive(true);
         m_health3.SetActive(true);
+
+        //Shields gaan pas aan met de power up
+        m_shield.SetActive(false);
+        m_shield2.SetActive(false);
+        m_shield3.SetActive(false);
+
+        //Zelfde voor de special attack
+        m_Special.SetActive(false); 
+        m_Special2.SetActive(false);
+        m_Special3.SetActive(false);
+        m_Special4.SetActive(false);
     }
+
+
     #endregion
     #region Inputs
     private void OnMove(InputAction.CallbackContext _context)
@@ -111,8 +146,18 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnSpecialFire(InputAction.CallbackContext _context)
     {
-        Debug.Log("Special shot fired");
+        if(m_specialAttackCount >= 4)
+        {
+            if(m_waveManager.m_spawnedBoss.Count == 0)
+            {
+                foreach (GameObject enemy in m_waveManager.m_spawnedEnemies)
+                {
+                    Destroy(enemy);
+                }
+            }
+        }
     }
+
     #endregion
     #region Health & PowerUps
     public void AddHealth()
@@ -122,7 +167,26 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        m_Health -= 1;
+        if (!m_shielded)
+        {
+            m_Health -= 1;
+        }
+        else
+        {
+           ShieldDown();
+        }
+    }
+
+    private void ShieldDown()
+    {
+        if (m_shielded)
+        {
+            m_shieldsAmount--;
+            if(m_shieldsAmount <= 0)
+            {
+                m_shielded = false;
+            }
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -141,6 +205,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        #region Screenwrapper
         //Get the screen position of object in Pixels
         Vector2 screenPos = Camera.main.WorldToScreenPoint(transform.position);
         
@@ -158,7 +223,17 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.position = new Vector2(leftSideOfScreenInWorld, transform.position.y);
         }
+        #endregion
+        #region Fuel
+        m_fuel -= Time.deltaTime;
 
+        if(m_fuel <= 0)
+        {
+
+            Destroy(gameObject);
+        }
+        #endregion
+        #region Health and Shielf
         else if (m_Health == 2)
         {
             m_health3.SetActive(false);
@@ -174,6 +249,43 @@ public class PlayerMovement : MonoBehaviour
             Destroy(gameObject);
             SceneManager.LoadScene("Death Scene");
         }
+
+        if (m_shieldsAmount == 2)
+        {
+            m_shield3.SetActive(false);
+        }
+
+        else if (m_shieldsAmount == 1)
+        {
+            m_shield2.SetActive(false);
+        }
+
+        else if (m_shieldsAmount == 0)
+        {
+            m_shield.SetActive(false);
+        }
+        #endregion
+        #region Special
+        if (m_specialAttackCount > 0)
+        {
+            m_Special.SetActive(true);
+        }
+
+        else if (m_specialAttackCount == 2)
+        {
+            m_Special2.SetActive(true);
+        }
+
+        else if (m_specialAttackCount == 3)
+        {
+            m_Special3.SetActive(true);
+        }
+
+        else if (m_specialAttackCount == 4)
+        {
+            m_Special4.SetActive(true);
+        }
+        #endregion
     }
 
     public void ResumeGame()

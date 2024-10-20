@@ -14,22 +14,24 @@ public class EnemyBase : MonoBehaviour
     protected int m_Score;
 
     [SerializeField]
-    protected List<GameObject> PowerUps = new List<GameObject>();
+    protected List<GameObject> m_powerUps = new List<GameObject>();
 
     [SerializeField]
     protected GameObject m_explosion;
 
+    [SerializeField]
     protected bool m_isBoss;
 
-    protected PlayerMovement m_player;
+    private int m_powerUpDrop;
+    private GameObject m_powerUpToDrop;
 
+    private WaveManager m_waveManager;
+    protected PlayerMovement m_player;
     protected EnemyState m_enemyState;
 
     protected Vector2 m_enemyPosition;
     protected Vector2 m_screenSpace;
     private   Vector2 m_spawnPosition;
-
-    private WaveManager m_waveManager;
 
     protected float m_Health = 3;
 
@@ -115,10 +117,29 @@ public class EnemyBase : MonoBehaviour
             }
         }
     }
-    
+
     private void OnDestroy()
     {
+        PowerUpDrops();
         m_waveManager.RemoveFromList(this.gameObject);
         Destroy(gameObject);
+    }
+
+    private void PowerUpDrops()
+    {
+        if (m_isBoss && !m_player.m_bulletUltra)
+        {
+            m_powerUpDrop = 1;
+        }
+        else
+        {
+            m_powerUpDrop = Random.Range(0, m_powerUps.Count);
+            if(m_powerUpDrop == 1 && m_player.m_bulletUltra)
+            {
+                m_powerUpDrop++;
+            }
+        }
+        m_powerUpToDrop = m_powerUps[m_powerUpDrop];
+        Instantiate(m_powerUpToDrop, transform.position, Quaternion.identity);
     }
 }

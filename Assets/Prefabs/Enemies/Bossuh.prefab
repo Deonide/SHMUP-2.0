@@ -204,8 +204,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Score: 250
-  PowerUps: []
+  m_powerUps:
+  - {fileID: 2388571467454170317, guid: 51c19411704a5eb43908807fdeb9b15a, type: 3}
+  - {fileID: 6140110725220540723, guid: 718b83bdd2463964dab6ebc7dc9b8430, type: 3}
+  - {fileID: 5831839395853610582, guid: 864160d036a63c54e98efa2b4b7b38f7, type: 3}
+  - {fileID: 2646585944132441315, guid: 0ca43b0ab3ac53245957d542c73f9842, type: 3}
+  - {fileID: 650922388970586345, guid: 723ae6dfdb7f22c4888eecef28e7c7c2, type: 3}
+  - {fileID: 650922388970586345, guid: 723ae6dfdb7f22c4888eecef28e7c7c2, type: 3}
+  - {fileID: 650922388970586345, guid: 723ae6dfdb7f22c4888eecef28e7c7c2, type: 3}
   m_explosion: {fileID: 928709870121530605, guid: ad1f87ebf3ed7954b87df29d1c2c4686, type: 3}
+  m_isBoss: 1
   m_bulletPrefab: {fileID: 6742634752544110382, guid: 4a930cde06b01e84b8ec84380c47659b, type: 3}
   m_bulletSpawnPoint: {fileID: 2436007282173833368}
   angularSpeed: 1

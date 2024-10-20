@@ -2,17 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShieldPowerUp : MonoBehaviour
+public class ShieldPowerUp : PowerUpBase
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void Activate()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        m_player.m_shielded = true;
+        m_player.m_shieldsAmount = 3;
+        m_player.m_shield.SetActive(true); 
+        m_player.m_shield2.SetActive(true);
+        m_player.m_shield3.SetActive(true);
+        base.Activate();
     }
 }

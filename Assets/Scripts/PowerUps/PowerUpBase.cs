@@ -6,12 +6,10 @@ public class PowerUpBase : MonoBehaviour
 {
     protected PlayerMovement m_player;
 
-
     void Start()
     {
         m_player = FindObjectOfType<PlayerMovement>();
     }
-
 
     public virtual void Activate()
     {
