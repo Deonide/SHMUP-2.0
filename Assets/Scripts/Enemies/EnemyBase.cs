@@ -95,7 +95,7 @@ public class EnemyBase : MonoBehaviour
 
         if(m_enemyPosition.y <= -6)
         {
-            OnDestroy();
+            Destroy(gameObject);
         }
     }
 
@@ -106,13 +106,13 @@ public class EnemyBase : MonoBehaviour
             if (collision.gameObject.CompareTag("Player"))
             {
                 m_Health -= m_player.m_bulletDamage;
-
+                Debug.Log(m_Health);
                 if (m_Health <= 0)
                 {
                     m_player.AddScore(m_Score);
                     Instantiate(m_explosion, new Vector3(transform.position.x, transform.position.y, 0), Quaternion.identity);
-
-                    OnDestroy();
+                    PowerUpDrops();
+                    Destroy(gameObject);
                 }
             }
         }
@@ -120,9 +120,7 @@ public class EnemyBase : MonoBehaviour
 
     private void OnDestroy()
     {
-        PowerUpDrops();
         m_waveManager.RemoveFromList(this.gameObject);
-        Destroy(gameObject);
     }
 
     private void PowerUpDrops()
@@ -134,11 +132,13 @@ public class EnemyBase : MonoBehaviour
         else
         {
             m_powerUpDrop = Random.Range(0, m_powerUps.Count);
-            if(m_powerUpDrop == 1 && m_player.m_bulletUltra)
+            if(m_powerUpDrop == 1 && !m_isBoss || m_player.m_bulletUltra)
             {
                 m_powerUpDrop++;
             }
         }
+
+        Debug.Log(m_powerUpDrop);
         m_powerUpToDrop = m_powerUps[m_powerUpDrop];
         Instantiate(m_powerUpToDrop, transform.position, Quaternion.identity);
     }
