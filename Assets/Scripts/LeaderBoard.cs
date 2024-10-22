@@ -11,6 +11,8 @@ public class LeaderBoard : MonoBehaviour
     List<string> m_NamesList = new List<string>();
     List<int> m_ScoreList = new List<int>();
 
+    private int m_placement = 375;
+
     private void Start()
     {
         m_Canvas = GetComponent<Canvas>();
@@ -61,8 +63,16 @@ public class LeaderBoard : MonoBehaviour
             int _rank = i + 1;
             TextMeshProUGUI _newText = Instantiate(m_LeaderBoard, m_Canvas.transform);
             RectTransform _rectTransform = _newText.GetComponent<RectTransform>();
-            _rectTransform.anchoredPosition = new Vector2(-290, 220 - i * 15);
-            _newText.text = "#" + _rank + " - " + m_ScoreList[i] + ": " + m_NamesList[i];
+            if (_rank > 5)
+            {
+                _rectTransform.anchoredPosition = new Vector2(425, 220 - i * 75 + m_placement);
+                _newText.text = "#" + _rank + " - " + m_ScoreList[i] + ": " + m_NamesList[i];
+            }
+            else
+            {
+                _rectTransform.anchoredPosition = new Vector2(-290, 220 - i * 75);
+                _newText.text = "#" + _rank + " - " + m_ScoreList[i] + ": " + m_NamesList[i];
+            }
         }
 
         //Voor wanneer de speler niet in de top 10 eindigt.
@@ -71,7 +81,7 @@ public class LeaderBoard : MonoBehaviour
         {
             TextMeshProUGUI playerText = Instantiate(m_LeaderBoard, m_Canvas.transform);
             RectTransform playerRectTransform = playerText.GetComponent<RectTransform>();
-            playerRectTransform.anchoredPosition = new Vector2(-290, 220 - displayCount * 15 - 10);
+            playerRectTransform.anchoredPosition = new Vector2(110, -175);
             playerText.text = "#" + playerRank + " - " + PlayerSettings.Instance.m_score + ": " + PlayerSettings.Instance.m_IGN;
         }
 
