@@ -26,22 +26,6 @@ public class Bullet : MonoBehaviour
         m_player = FindObjectOfType<PlayerMovement>();
     }
 
-    private void Update()
-    {
-        if (m_player.m_bulletPowered != true)
-        {
-            m_player.m_bulletDamage = 1;
-        }
-        else if (m_player.m_bulletPowered == true)
-        {
-            m_player.m_bulletDamage = 2;
-        }
-        else if (m_player.m_bulletUltra != true)
-        {
-            m_player.m_bulletDamage = 3;
-        }
-    }
-
     //Als de gameObject iets raakt gaat ie stuk.
     private void OnCollisionEnter2D(Collision2D collision)
     {

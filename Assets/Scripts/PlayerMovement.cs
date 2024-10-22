@@ -20,15 +20,24 @@ public class PlayerMovement : MonoBehaviour
     public int m_bulletDamage;
     public bool m_bulletPowered, m_bulletUltra;
 
-    [Header("Health & Shields")]
+    [Header("Health")]
 
-    public GameObject m_health1;
-    public GameObject m_health2, m_health3, m_shield, m_shield2, m_shield3;
-    
-    public int m_Health = 3;
-    public int m_shieldsAmount;
+    [SerializeField]
+    private GameObject m_health1;
+    [SerializeField]
+    private GameObject m_health2, m_health3;
+    [SerializeField]
+    private int m_Health = 3;
 
-    public bool m_shielded;
+    [Header("Shields")]
+    [SerializeField]
+    private GameObject m_shield;
+    [SerializeField]
+    private GameObject m_shield2, m_shield3;
+    [SerializeField] 
+    private int m_shieldsAmount;
+
+    private bool m_shielded;
 
     [Header("Special Attack")]
     public GameObject m_Special;
@@ -168,7 +177,16 @@ public class PlayerMovement : MonoBehaviour
     #region Health & PowerUps
     public void AddHealth()
     {
-        m_Health = 3; 
+        m_Health += 1;
+    }
+
+    public void AddShield()
+    {
+        m_shielded = true;
+        m_shieldsAmount = 3;
+        m_shield.SetActive(true);
+        m_shield2.SetActive(true);
+        m_shield3.SetActive(true);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -214,6 +232,20 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+
+        if (m_bulletPowered != true)
+        {
+            m_bulletDamage = 1;
+        }
+        else if (m_bulletPowered == true && !m_bulletUltra)
+        {
+            m_bulletDamage = 2;
+        }
+        else if (m_bulletUltra == true)
+        {
+            m_bulletDamage = 3;
+        }
+
         #region Screenwrapper
         //Get the screen position of object in Pixels
         Vector2 screenPos = Camera.main.WorldToScreenPoint(transform.position);
@@ -247,7 +279,7 @@ public class PlayerMovement : MonoBehaviour
             SceneManager.LoadScene("Death Scene");
         }
         #endregion
-        #region Health and Shielf
+        #region Health and Shield
         else if (m_Health == 2)
         {
             m_health3.SetActive(false);
@@ -258,7 +290,7 @@ public class PlayerMovement : MonoBehaviour
             m_health2.SetActive(false);
         }
 
-        else if (m_Health <= 0)
+        if (m_Health <= 0)
         {
             Destroy(gameObject);
             SceneManager.LoadScene("Death Scene");
