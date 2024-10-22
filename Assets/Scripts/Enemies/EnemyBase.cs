@@ -120,6 +120,10 @@ public class EnemyBase : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (m_isBoss)
+        {
+            m_waveManager.RemoveBossFromList(this.gameObject);
+        }
         m_waveManager.RemoveFromList(this.gameObject);
     }
 
@@ -127,18 +131,16 @@ public class EnemyBase : MonoBehaviour
     {
         if (m_isBoss && !m_player.m_bulletUltra)
         {
-            m_powerUpDrop = 1;
+            m_powerUpDrop = 0;
         }
         else
         {
             m_powerUpDrop = Random.Range(0, m_powerUps.Count);
-            if(m_powerUpDrop == 1 && !m_isBoss || m_player.m_bulletUltra)
+            if(m_powerUpDrop == 0 && !m_isBoss || m_powerUpDrop == 0 && m_player.m_bulletUltra)
             {
                 m_powerUpDrop++;
             }
         }
-
-        Debug.Log(m_powerUpDrop);
         m_powerUpToDrop = m_powerUps[m_powerUpDrop];
         Instantiate(m_powerUpToDrop, transform.position, Quaternion.identity);
     }

@@ -37,7 +37,7 @@ public class WaveManager : MonoBehaviour
         while (true)
         {
             yield return (wait);
-            if (m_spawnedEnemies.Count == 0)
+            if (m_spawnedEnemies.Count == 0 && m_spawnedBoss.Count == 0)
             {
                 GameManager.Instance.m_currentWave++;
                 if(GameManager.Instance.m_currentWave % 4 == 0)
@@ -82,6 +82,11 @@ public class WaveManager : MonoBehaviour
     public void RemoveFromList(GameObject enemy)
     {
         m_spawnedEnemies.Remove(enemy);
+    }
+
+    public void RemoveBossFromList(GameObject enemy)
+    {
+        m_spawnedBoss.Remove(enemy);
     }
 
     public void WaveCounter()
