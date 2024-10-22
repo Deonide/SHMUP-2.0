@@ -10,5 +10,6 @@ public class HealthPowerUp : PowerUpBase
 
         m_player.m_health2.SetActive(true);
         m_player.m_health3.SetActive(true);
+        base.Activate();
     }
 }

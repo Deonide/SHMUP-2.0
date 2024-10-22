@@ -17,6 +17,6 @@ public class ShootPowerUp : PowerUpBase
             m_player.m_bulletPowered = false;
         }
 
-        Destroy(gameObject);
+        base.Activate();
     }
 }
