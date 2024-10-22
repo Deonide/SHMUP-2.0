@@ -42,6 +42,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI m_scoreText;
 
+    [SerializeField] 
+    private FuelBar m_fuelBar;
+
     private PlayerControls m_playerControls;
     private WaveManager m_waveManager;
 
@@ -50,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
     //<-- Changeable variables -->
     public float m_fuel;
+    private float m_maxFuel = 100;
     public float m_Speed;
 
 #endregion
@@ -77,6 +81,8 @@ public class PlayerMovement : MonoBehaviour
         m_rb = GetComponent<Rigidbody2D>();
         m_waveManager = FindObjectOfType<WaveManager>();
         m_fuel = 100;
+        m_fuelBar.SetMaxFuel(m_maxFuel);
+        GameManager.Instance.m_currentWave = 0;
 
 
         m_health1.SetActive(true); 
@@ -167,13 +173,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!m_shielded)
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            m_Health -= 1;
-        }
-        else
-        {
-           ShieldDown();
+            if (!m_shielded)
+            {
+                m_Health -= 1;
+            }
+            else
+            {
+                ShieldDown();
+            }
         }
     }
 
@@ -226,11 +235,16 @@ public class PlayerMovement : MonoBehaviour
         #endregion
         #region Fuel
         m_fuel -= Time.deltaTime;
-
-        if(m_fuel <= 0)
+        m_fuelBar.SetFuel(m_fuel);
+        if (m_fuel > 100)
         {
+            m_fuel = 100;
+        }
 
+        if (m_fuel <= 0)
+        {
             Destroy(gameObject);
+            SceneManager.LoadScene("Death Scene");
         }
         #endregion
         #region Health and Shielf
