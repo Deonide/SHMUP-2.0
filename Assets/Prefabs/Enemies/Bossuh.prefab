@@ -204,6 +204,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Score: 250
+  m_moneyToGive: 50
   m_powerUps:
   - {fileID: 2388571467454170317, guid: 51c19411704a5eb43908807fdeb9b15a, type: 3}
   - {fileID: 6140110725220540723, guid: 718b83bdd2463964dab6ebc7dc9b8430, type: 3}

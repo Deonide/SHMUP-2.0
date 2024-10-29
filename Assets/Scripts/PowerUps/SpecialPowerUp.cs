@@ -7,7 +7,7 @@ public class SpecialPowerUp : PowerUpBase
 
     public override void Activate()
     {
-        m_player.m_specialAttackCount++;
+        m_player.AddSpecial();
         base.Activate();
     }
 }

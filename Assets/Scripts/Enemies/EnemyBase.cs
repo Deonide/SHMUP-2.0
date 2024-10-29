@@ -11,7 +11,7 @@ public class EnemyBase : MonoBehaviour
     }
 
     [SerializeField]
-    protected int m_Score;
+    protected int m_Score, m_moneyToGive;
 
     [SerializeField]
     protected List<GameObject> m_powerUps = new List<GameObject>();
@@ -110,6 +110,7 @@ public class EnemyBase : MonoBehaviour
                 if (m_Health <= 0)
                 {
                     m_player.AddScore(m_Score);
+                    m_player.GetMoney(m_moneyToGive);
                     Instantiate(m_explosion, new Vector3(transform.position.x, transform.position.y, 0), Quaternion.identity);
                     PowerUpDrops();
                     Destroy(gameObject);

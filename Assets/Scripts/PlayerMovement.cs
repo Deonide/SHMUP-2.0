@@ -49,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
     private GameObject m_pauseScreen;
 
     [SerializeField]
-    private TextMeshProUGUI m_scoreText;
+    private TextMeshProUGUI m_scoreText, m_moneyText;
 
     [SerializeField] 
     private FuelBar m_fuelBar;
@@ -62,8 +62,9 @@ public class PlayerMovement : MonoBehaviour
 
     //<-- Changeable variables -->
     public float m_fuel;
-    private float m_maxFuel = 100;
     public float m_Speed;
+
+
 
 #endregion
     #region Start Game
@@ -89,10 +90,12 @@ public class PlayerMovement : MonoBehaviour
     {
         m_rb = GetComponent<Rigidbody2D>();
         m_waveManager = FindObjectOfType<WaveManager>();
-        m_fuel = 100;
-        m_fuelBar.SetMaxFuel(m_maxFuel);
+        GetMoneyText();
+        PlayerSettings.Instance.MaxFuel();
+        m_fuel = PlayerSettings.Instance.m_maxFuel;
+        m_fuelBar.SetMaxFuel(PlayerSettings.Instance.m_maxFuel);
         GameManager.Instance.m_currentWave = 0;
-
+        PlayerSettings.Instance.GetVariables();
 
         m_health1.SetActive(true); 
         m_health2.SetActive(true);
@@ -177,16 +180,50 @@ public class PlayerMovement : MonoBehaviour
     #region Health & PowerUps
     public void AddHealth()
     {
-        m_Health += 1;
+        if (PlayerSettings.Instance.m_healthMax == 1)
+        {
+            m_Health = 3;
+        }
+        else
+        {
+            m_Health += 1;
+        }
     }
 
     public void AddShield()
     {
         m_shielded = true;
-        m_shieldsAmount = 3;
-        m_shield.SetActive(true);
-        m_shield2.SetActive(true);
-        m_shield3.SetActive(true);
+        if (PlayerSettings.Instance.m_shieldPower == 1)
+        {
+            m_shieldsAmount = 2;
+        }
+
+        else if (PlayerSettings.Instance.m_shieldPower == 2)
+        {
+            m_shieldsAmount = 3;
+        }
+
+        else
+        {
+            m_shieldsAmount += 1;
+        }
+    }
+
+    public void AddSpecial()
+    {
+        if(PlayerSettings.Instance.m_specialPower == 1)
+        {
+            m_specialAttackCount += 2;
+        }
+
+        else if (PlayerSettings.Instance.m_specialPower == 2)
+        {
+            m_specialAttackCount += 3;
+        }
+        else
+        {
+            m_specialAttackCount++;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -273,29 +310,13 @@ public class PlayerMovement : MonoBehaviour
             m_fuel = 100;
         }
 
-        if (m_fuel <= 0)
+        else if (m_fuel <= 0)
         {
             Destroy(gameObject);
             SceneManager.LoadScene("Death Scene");
         }
         #endregion
         #region Health and Shield
-        else if (m_Health == 2)
-        {
-            m_health3.SetActive(false);
-        }
-
-        else if (m_Health == 1)
-        {
-            m_health2.SetActive(false);
-        }
-
-        if (m_Health <= 0)
-        {
-            Destroy(gameObject);
-            SceneManager.LoadScene("Death Scene");
-        }
-
         if (m_shieldsAmount == 2)
         {
             m_shield3.SetActive(false);
@@ -310,8 +331,33 @@ public class PlayerMovement : MonoBehaviour
         {
             m_shield.SetActive(false);
         }
+
+
+        if (m_Health == 2)
+        {
+            m_health3.SetActive(false);
+        }
+
+        else if (m_Health == 1)
+        {
+            m_health2.SetActive(false);
+        }
+
+        else if (m_Health <= 0)
+        {
+            PlayerSettings.Instance.SetVariables();
+            Destroy(gameObject);
+            SceneManager.LoadScene("Death Scene");
+        }
         #endregion
         #region Special
+
+        if(m_specialAttackCount > 4)
+        {
+            m_specialAttackCount = 4;
+        }
+
+
         if (m_specialAttackCount > 0)
         {
             m_Special.SetActive(true);
@@ -345,11 +391,35 @@ public class PlayerMovement : MonoBehaviour
         PlayerSettings.Instance.m_score += score;
         if (PlayerSettings.Instance.m_score < 1000)
         {
-            m_scoreText.text = "0" + PlayerSettings.Instance.m_score.ToString();
+            m_scoreText.text = "Score: 0" + PlayerSettings.Instance.m_score.ToString();
         }
         else
         {
-            m_scoreText.text = PlayerSettings.Instance.m_score.ToString();
+            m_scoreText.text = "Score: " + PlayerSettings.Instance.m_score.ToString();
         }
+    }
+
+    public void GetMoney(int money)
+    {
+        PlayerSettings.Instance.m_money += money;
+
+        GetMoneyText();
+    }
+
+    public void GetMoneyText()
+    {
+
+        if (PlayerSettings.Instance.m_money < 1000)
+        {
+            m_moneyText.text = "Money: " + PlayerSettings.Instance.m_money.ToString();
+        }
+        else
+        {
+            m_moneyText.text = "Money: " + PlayerSettings.Instance.m_money.ToString();
+        }
+    }
+    private void SaveMoney()
+    {
+        PlayerPrefs.SetInt("Current Money", PlayerSettings.Instance.m_money);
     }
 }
