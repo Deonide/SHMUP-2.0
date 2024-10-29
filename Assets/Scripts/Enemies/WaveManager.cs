@@ -50,7 +50,7 @@ public class WaveManager : MonoBehaviour
                     WaveCounter();
 
                     m_spawnedEnemiesLoop = 0;
-                    m_amountOfEnemies = 3 + Mathf.Round(GameManager.Instance.m_currentWave / 8);
+                    m_amountOfEnemies = 3 + Mathf.Round(GameManager.Instance.m_currentWave / 16);
                     if(m_amountOfEnemies > 7)
                     {
                         m_amountOfEnemies = 7;

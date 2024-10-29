@@ -60,10 +60,6 @@ public class BossScript : ShootingTowardsPlayer
         switch (m_bossState)
         {
             case BossState.standstill:
-                if (m_Health > 0 && m_enemyState == EnemyState.Active)
-                {
-                    ;
-                }
 
                 break;
             case BossState.moveAround:
