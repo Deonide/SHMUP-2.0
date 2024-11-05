@@ -12,6 +12,6 @@ public class EnterIGN : MonoBehaviour
 
     public void SetIGN()
     {
-        PlayerSettings.Instance.m_IGN = m_enterIGN.text.ToString();
+        GameManager.Instance.m_IGN = m_enterIGN.text.ToString();
     }
 }

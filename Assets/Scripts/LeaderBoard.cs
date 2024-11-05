@@ -32,22 +32,22 @@ public class LeaderBoard : MonoBehaviour
             }
         }
 
-        if (!m_NamesList.Contains(PlayerSettings.Instance.m_IGN))
+        if (!m_NamesList.Contains(GameManager.Instance.m_IGN))
         {
-            if (!string.IsNullOrEmpty(PlayerSettings.Instance.m_IGN))
+            if (!string.IsNullOrEmpty(GameManager.Instance.m_IGN))
             {
-                m_NamesList.Add(PlayerSettings.Instance.m_IGN);
-                m_ScoreList.Add(PlayerSettings.Instance.m_score);
+                m_NamesList.Add(GameManager.Instance.m_IGN);
+                m_ScoreList.Add(GameManager.Instance.m_score);
                 CheckForRanking();
             }
         }
 
         else
         {
-            int _currentName = m_NamesList.IndexOf(PlayerSettings.Instance.m_IGN);
-            if (PlayerSettings.Instance.m_score > m_ScoreList[_currentName])
+            int _currentName = m_NamesList.IndexOf(GameManager.Instance.m_IGN);
+            if (GameManager.Instance.m_score > m_ScoreList[_currentName])
             {
-                m_ScoreList[_currentName] = PlayerSettings.Instance.m_score;
+                m_ScoreList[_currentName] = GameManager.Instance.m_score;
                 CheckForRanking();
             }
         }
@@ -76,13 +76,13 @@ public class LeaderBoard : MonoBehaviour
         }
 
         //Voor wanneer de speler niet in de top 10 eindigt.
-        int playerRank = m_NamesList.IndexOf(PlayerSettings.Instance.m_IGN) + 1;
+        int playerRank = m_NamesList.IndexOf(GameManager.Instance.m_IGN) + 1;
         if (playerRank > 10)
         {
             TextMeshProUGUI playerText = Instantiate(m_LeaderBoard, m_Canvas.transform);
             RectTransform playerRectTransform = playerText.GetComponent<RectTransform>();
             playerRectTransform.anchoredPosition = new Vector2(110, -175);
-            playerText.text = "#" + playerRank + " - " + PlayerSettings.Instance.m_score + ": " + PlayerSettings.Instance.m_IGN;
+            playerText.text = "#" + playerRank + " - " + GameManager.Instance.m_score + ": " + GameManager.Instance.m_IGN;
         }
 
         SaveData();

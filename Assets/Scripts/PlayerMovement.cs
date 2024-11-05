@@ -85,17 +85,19 @@ public class PlayerMovement : MonoBehaviour
         m_playerControls.PlayerMovement.Movement.canceled += OnMoveStop;
 
         m_pauseScreen.SetActive(false);
+        GameManager.Instance.LoadSaveData();
     }
     void Start()
     {
         m_rb = GetComponent<Rigidbody2D>();
         m_waveManager = FindObjectOfType<WaveManager>();
         GetMoneyText();
-        PlayerSettings.Instance.MaxFuel();
-        m_fuel = PlayerSettings.Instance.m_maxFuel;
-        m_fuelBar.SetMaxFuel(PlayerSettings.Instance.m_maxFuel);
-        GameManager.Instance.m_currentWave = 0;
-        PlayerSettings.Instance.GetVariables();
+        GameManager.Instance.MaxFuel();
+        m_fuel = GameManager.Instance.m_maxFuel;
+        m_fuelBar.SetMaxFuel(GameManager.Instance.m_maxFuel);
+        GameManager.Instance.m_currentGroup = 0;
+        GameManager.Instance.m_score = 0;
+
 
         m_health1.SetActive(true); 
         m_health2.SetActive(true);
@@ -180,7 +182,7 @@ public class PlayerMovement : MonoBehaviour
     #region Health & PowerUps
     public void AddHealth()
     {
-        if (PlayerSettings.Instance.m_healthMax == 1)
+        if (GameManager.Instance.m_healthMax == 1)
         {
             m_Health = 3;
         }
@@ -193,12 +195,12 @@ public class PlayerMovement : MonoBehaviour
     public void AddShield()
     {
         m_shielded = true;
-        if (PlayerSettings.Instance.m_shieldPower == 1)
+        if (GameManager.Instance.m_shieldPower == 1)
         {
             m_shieldsAmount = 2;
         }
 
-        else if (PlayerSettings.Instance.m_shieldPower == 2)
+        else if (GameManager.Instance.m_shieldPower == 2)
         {
             m_shieldsAmount = 3;
         }
@@ -211,12 +213,12 @@ public class PlayerMovement : MonoBehaviour
 
     public void AddSpecial()
     {
-        if(PlayerSettings.Instance.m_specialPower == 1)
+        if(GameManager.Instance.m_specialPower == 1)
         {
             m_specialAttackCount += 2;
         }
 
-        else if (PlayerSettings.Instance.m_specialPower == 2)
+        else if (GameManager.Instance.m_specialPower == 2)
         {
             m_specialAttackCount += 3;
         }
@@ -345,7 +347,7 @@ public class PlayerMovement : MonoBehaviour
 
         else if (m_Health <= 0)
         {
-            PlayerSettings.Instance.SetVariables();
+            GameManager.Instance.SaveGame();
             Destroy(gameObject);
             SceneManager.LoadScene("Death Scene");
         }
@@ -388,20 +390,20 @@ public class PlayerMovement : MonoBehaviour
 
     public void AddScore(int score)
     {
-        PlayerSettings.Instance.m_score += score;
-        if (PlayerSettings.Instance.m_score < 1000)
+        GameManager.Instance.m_score += score;
+        if (GameManager.Instance.m_score < 1000)
         {
-            m_scoreText.text = "Score: 0" + PlayerSettings.Instance.m_score.ToString();
+            m_scoreText.text = "Score: 0" + GameManager.Instance.m_score.ToString();
         }
         else
         {
-            m_scoreText.text = "Score: " + PlayerSettings.Instance.m_score.ToString();
+            m_scoreText.text = "Score: " + GameManager.Instance.m_score.ToString();
         }
     }
 
     public void GetMoney(int money)
     {
-        PlayerSettings.Instance.m_money += money;
+        GameManager.Instance.m_money += money;
 
         GetMoneyText();
     }
@@ -409,17 +411,13 @@ public class PlayerMovement : MonoBehaviour
     public void GetMoneyText()
     {
 
-        if (PlayerSettings.Instance.m_money < 1000)
+        if (GameManager.Instance.m_money < 1000)
         {
-            m_moneyText.text = "Money: " + PlayerSettings.Instance.m_money.ToString();
+            m_moneyText.text = "Money: " + GameManager.Instance.m_money.ToString();
         }
         else
         {
-            m_moneyText.text = "Money: " + PlayerSettings.Instance.m_money.ToString();
+            m_moneyText.text = "Money: " + GameManager.Instance.m_money.ToString();
         }
-    }
-    private void SaveMoney()
-    {
-        PlayerPrefs.SetInt("Current Money", PlayerSettings.Instance.m_money);
     }
 }
