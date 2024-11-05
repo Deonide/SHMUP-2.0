@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,27 +22,25 @@ public class PlayerMovement : MonoBehaviour
     public bool m_bulletPowered, m_bulletUltra;
 
     [Header("Health")]
+    [SerializeField]
+    private List<GameObject> m_healthCount = new List<GameObject>();
 
     [SerializeField]
-    private GameObject m_health1;
-    [SerializeField]
-    private GameObject m_health2, m_health3;
-    [SerializeField]
-    private int m_Health = 3;
+    private int m_health;
 
     [Header("Shields")]
     [SerializeField]
-    private GameObject m_shield;
-    [SerializeField]
-    private GameObject m_shield2, m_shield3;
-    [SerializeField] 
+    private List<GameObject> m_shield = new List<GameObject>();
+
     private int m_shieldsAmount;
 
     private bool m_shielded;
 
     [Header("Special Attack")]
-    public GameObject m_Special;
-    public GameObject m_Special2, m_Special3, m_Special4;
+    [SerializeField]
+    private List<GameObject> m_special = new List<GameObject>();
+
+    [SerializeField]
     public int m_specialAttackCount;
 
     [Header("Other")]
@@ -66,7 +65,7 @@ public class PlayerMovement : MonoBehaviour
 
 
 
-#endregion
+    #endregion
     #region Start Game
     private void Awake()
     {
@@ -99,20 +98,22 @@ public class PlayerMovement : MonoBehaviour
         GameManager.Instance.m_score = 0;
 
 
-        m_health1.SetActive(true); 
-        m_health2.SetActive(true);
-        m_health3.SetActive(true);
+        foreach (GameObject health in m_healthCount)
+        {
+            health.SetActive(true);
+        }
 
         //Shields gaan pas aan met de power up
-        m_shield.SetActive(false);
-        m_shield2.SetActive(false);
-        m_shield3.SetActive(false);
+        foreach (GameObject shield in m_shield)
+        {
+            shield.SetActive(false);
+        }
 
         //Zelfde voor de special attack
-        m_Special.SetActive(false); 
-        m_Special2.SetActive(false);
-        m_Special3.SetActive(false);
-        m_Special4.SetActive(false);
+        foreach (GameObject special in m_special)
+        {
+            special.SetActive(false);
+        }
     }
 
 
@@ -166,32 +167,24 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnSpecialFire(InputAction.CallbackContext _context)
     {
-        if(m_specialAttackCount >= 4)
+        if(m_specialAttackCount == 4)
         {
-            if(m_waveManager.m_spawnedBoss.Count == 0)
+            if (m_waveManager.m_spawnedEnemies != null)
             {
                 foreach (GameObject enemy in m_waveManager.m_spawnedEnemies)
                 {
                     Destroy(enemy);
                 }
             }
+            m_specialAttackCount = 0;
+            CheckSpecialCount();
         }
     }
 
     #endregion
     #region Health & PowerUps
-    public void AddHealth()
-    {
-        if (GameManager.Instance.m_healthMax == 1)
-        {
-            m_Health = 3;
-        }
-        else
-        {
-            m_Health += 1;
-        }
-    }
 
+    #region Shields
     public void AddShield()
     {
         m_shielded = true;
@@ -209,8 +202,33 @@ public class PlayerMovement : MonoBehaviour
         {
             m_shieldsAmount += 1;
         }
+
+        CheckShields();
     }
 
+    private void ShieldDown()
+    {
+        if (m_shielded)
+        {
+            m_shieldsAmount--;
+            CheckShields();
+
+            if (m_shieldsAmount <= 0)
+            {
+                m_shielded = false;
+            }
+        }
+    }
+
+    private void CheckShields()
+    {
+        for (int i = 0; i < m_shieldsAmount; i++)
+        {
+            m_shield[i].SetActive(true);
+        }
+    }
+    #endregion
+    #region Special
     public void AddSpecial()
     {
         if(GameManager.Instance.m_specialPower == 1)
@@ -222,20 +240,44 @@ public class PlayerMovement : MonoBehaviour
         {
             m_specialAttackCount += 3;
         }
+
         else
         {
             m_specialAttackCount++;
         }
+
+        if (m_specialAttackCount > 4)
+        {
+            m_specialAttackCount = 4;
+        }
+
+        CheckSpecialCount();
     }
 
+    private void CheckSpecialCount()
+    {
+        for (int i = 0; i < m_specialAttackCount; i++)
+        {
+            m_special[i].SetActive(true);
+        }
+    }
+    #endregion
+    #region Health And OnTrigger
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
             if (!m_shielded)
             {
-                m_Health -= 1;
+                m_health -= 1;
+                CheckHealth();
                 StartCoroutine(HealthFlash());
+                if (m_health <= 0)
+                {
+                    GameManager.Instance.SaveGame();
+                    Destroy(gameObject);
+                    SceneManager.LoadScene("Death Scene");
+                }
             }
             else
             {
@@ -255,19 +297,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
-    private void ShieldDown()
-    {
-        if (m_shielded)
-        {
-            m_shieldsAmount--;
-            if(m_shieldsAmount <= 0)
-            {
-                m_shielded = false;
-            }
-        }
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //Haal de PickUp class op van het object waartegen het botst
@@ -280,11 +309,37 @@ public class PlayerMovement : MonoBehaviour
             powerUp.Activate();
         }
     }
+    public void AddHealth()
+    {
+        if (GameManager.Instance.m_healthMax == 1)
+        {
+            m_health = 3;
+        }
+        else
+        {
+            m_health += 1;
+        }
+
+        if (m_health > 3)
+        {
+            m_health = 3;
+        }
+
+        CheckHealth();
+    }
+
+    private void CheckHealth()
+    {
+        for (int i = 0; i < m_health; i++)
+        {
+            m_healthCount[i].SetActive(true);
+        }
+    }
+    #endregion
     #endregion
 
     void Update()
     {
-
         if (m_bulletPowered != true)
         {
             m_bulletDamage = 1;
@@ -331,68 +386,6 @@ public class PlayerMovement : MonoBehaviour
             SceneManager.LoadScene("Death Scene");
         }
         #endregion
-        #region Health and Shield
-        if (m_shieldsAmount == 2)
-        {
-            m_shield3.SetActive(false);
-        }
-
-        else if (m_shieldsAmount == 1)
-        {
-            m_shield2.SetActive(false);
-        }
-
-        else if (m_shieldsAmount == 0)
-        {
-            m_shield.SetActive(false);
-        }
-
-
-        if (m_Health == 2)
-        {
-            m_health3.SetActive(false);
-        }
-
-        else if (m_Health == 1)
-        {
-            m_health2.SetActive(false);
-        }
-
-        else if (m_Health <= 0)
-        {
-            GameManager.Instance.SaveGame();
-            Destroy(gameObject);
-            SceneManager.LoadScene("Death Scene");
-        }
-        #endregion
-        #region Special
-
-        if(m_specialAttackCount > 4)
-        {
-            m_specialAttackCount = 4;
-        }
-
-
-        if (m_specialAttackCount > 0)
-        {
-            m_Special.SetActive(true);
-        }
-
-        else if (m_specialAttackCount == 2)
-        {
-            m_Special2.SetActive(true);
-        }
-
-        else if (m_specialAttackCount == 3)
-        {
-            m_Special3.SetActive(true);
-        }
-
-        else if (m_specialAttackCount == 4)
-        {
-            m_Special4.SetActive(true);
-        }
-        #endregion
     }
 
     public void ResumeGame()
@@ -401,6 +394,7 @@ public class PlayerMovement : MonoBehaviour
         m_pauseScreen.SetActive(false);
     }
 
+    #region Score & Money
     public void AddScore(int score)
     {
         GameManager.Instance.m_score += score;
@@ -433,4 +427,5 @@ public class PlayerMovement : MonoBehaviour
             m_moneyText.text = "Money: " + GameManager.Instance.m_money.ToString();
         }
     }
+    #endregion
 }

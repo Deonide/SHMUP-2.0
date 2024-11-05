@@ -75,4 +75,22 @@ public class GameManager : Singleton<GameManager>
         m_specialPower = data.m_specialPower;
         m_fuelLevel = data.m_fuelLevel;
     }
+
+
+    [ContextMenu("ResetSave")]
+    public void ResetSave()
+    {
+        SaveData data = new SaveData();
+        data.m_cost = 25;
+        data.m_money = 0;
+        data.m_maxFuel = 100;
+        data.m_shieldPower = 0;
+        data.m_healthMax = 0;
+        data.m_specialPower = 0;
+        data.m_fuelLevel = 0;
+        SaveSystem.SerializeData(data);
+    }
+
+
+
 }

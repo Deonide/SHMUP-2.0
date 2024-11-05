@@ -11,29 +11,23 @@ public class BossScript : ShootingTowardsPlayer
         circling
     }
 
-    public float angularSpeed = 1f;
-    public float circleRad = 1f;
-
     [SerializeField]
     private Vector2 fixedPoint;
-    private float currentAngle;
-
 
     private BossState m_bossState;
-    
-    private int m_bossesSpawned;
     private int m_bossMoves;
     protected float m_timer;
     protected float m_enemySpeed;
-
+    private float currentAngle;
+    public float angularSpeed = 1f;
+    public float circleRad = 1f;
 
     protected override void Start()
     {
         m_isBoss = true;
         m_bossMoves = Random.Range(1, 4);
         m_projectileCount++;
-        m_bossesSpawned++;
-        m_Health = m_bossesSpawned * 4 + 12;
+        m_Health = GameManager.Instance.m_currentWave * 4 + 12;
         fixedPoint = transform.position;
         fixedPoint.y = 3;
         m_enemySpeed = 1 + Mathf.Round((GameManager.Instance.m_currentWave / 8));
@@ -77,9 +71,6 @@ public class BossScript : ShootingTowardsPlayer
                     transform.position = fixedPoint + offset;
                 }
                 break;
-
         }
-
-
     }
 }

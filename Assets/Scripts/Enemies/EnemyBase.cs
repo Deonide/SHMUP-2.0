@@ -106,7 +106,7 @@ public class EnemyBase : MonoBehaviour
             if (collision.gameObject.CompareTag("Player"))
             {
                 m_Health -= m_player.m_bulletDamage;
-                Debug.Log(m_Health);
+
                 if (m_Health <= 0)
                 {
                     m_player.AddScore(m_Score);

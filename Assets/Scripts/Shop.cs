@@ -22,6 +22,7 @@ public class Shop : MonoBehaviour
 
     void Start()
     {
+        GameManager.Instance.LoadSaveData();
         GetMoney();
         CheckText();
         foreach (GameObject powerUpgrades in m_powerUpUpgrades)
@@ -33,8 +34,7 @@ public class Shop : MonoBehaviour
     void Update()
     {
         #region PowerUpUpgrades
-
-        // Power Up variabels in playersettings    m_shieldPower, m_healthMax, m_specialPower, m_fuelLevel;
+        // Power Up variabels in GameManager   m_shieldPower, m_healthMax, m_specialPower, m_fuelLevel;
         if (GameManager.Instance.m_shieldPower == 1)
         {
             m_powerUpUpgrades[0].SetActive(true);
@@ -128,6 +128,12 @@ public class Shop : MonoBehaviour
             buttonText.text = GameManager.Instance.m_cost.ToString();
         }
     }
+
+    public void SetVariables()
+    {
+        GameManager.Instance.SaveGame();
+    }
+
 
     private void GetMoney()
     {
