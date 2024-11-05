@@ -235,6 +235,7 @@ public class PlayerMovement : MonoBehaviour
             if (!m_shielded)
             {
                 m_Health -= 1;
+                StartCoroutine(HealthFlash());
             }
             else
             {
@@ -242,6 +243,18 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+
+    private IEnumerator HealthFlash()
+    {
+        for( int i = 0; i < 10 ; i++ )
+        {
+            gameObject.GetComponent<SpriteRenderer>().enabled = false;
+            yield return new WaitForSeconds(0.1f);
+            gameObject.GetComponent<SpriteRenderer>().enabled = enabled;
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
 
     private void ShieldDown()
     {
