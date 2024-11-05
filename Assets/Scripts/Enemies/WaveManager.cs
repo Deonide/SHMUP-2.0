@@ -18,6 +18,9 @@ public class WaveManager : MonoBehaviour
     private TextMeshProUGUI m_waveCounter;
 
     [SerializeField]
+    private TextMeshProUGUI m_groupCounter;
+
+    [SerializeField]
     private bool m_canSpawn = true;
 
     public List<GameObject> m_spawnedEnemies = new List<GameObject>();
@@ -39,16 +42,16 @@ public class WaveManager : MonoBehaviour
             yield return (wait);
             if (m_spawnedEnemies.Count == 0 && m_spawnedBoss.Count == 0)
             {
-                GameManager.Instance.m_currentWave++;
-                if(GameManager.Instance.m_currentWave % 4 == 0)
+                GameManager.Instance.m_currentGroup++;
+                if(GameManager.Instance.m_currentGroup % 4 == 0)
                 {
+                    GroupCounter();
                     BossSpawner();
                 }
 
                 else
                 {
-                    WaveCounter();
-
+                    GroupCounter();
                     m_spawnedEnemiesLoop = 0;
                     m_amountOfEnemies = 3 + Mathf.Round(GameManager.Instance.m_currentWave / 16);
                     if(m_amountOfEnemies > 7)
@@ -87,10 +90,19 @@ public class WaveManager : MonoBehaviour
     public void RemoveBossFromList(GameObject enemy)
     {
         m_spawnedBoss.Remove(enemy);
+        GameManager.Instance.m_currentGroup = 0;
+        GameManager.Instance.m_currentWave++;
+        WaveCounter();
+        GroupCounter();
     }
 
     public void WaveCounter()
     {
         m_waveCounter.text = "Wave : " + GameManager.Instance.m_currentWave;
+    }
+
+    public void GroupCounter()
+    {
+        m_groupCounter.text = "Group : " + GameManager.Instance.m_currentGroup;
     }
 }

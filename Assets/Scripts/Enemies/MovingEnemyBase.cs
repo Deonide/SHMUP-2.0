@@ -10,7 +10,7 @@ public class MovingEnemyBase : EnemyBase
 
     protected override void Start()
     {
-        m_enemySpeed = 1 + Mathf.Round((GameManager.Instance.m_currentWave / 8));
+        m_enemySpeed = 1 + Mathf.Round((GameManager.Instance.m_currentWave / 4));
         base.Start();
     }
 
