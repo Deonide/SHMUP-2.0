@@ -55,7 +55,7 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerControls m_playerControls;
     private WaveManager m_waveManager;
-
+    private AudioManager m_audioManager;
     //<---  Movement    --->
     private Rigidbody2D m_rb;
 
@@ -90,6 +90,7 @@ public class PlayerMovement : MonoBehaviour
     {
         m_rb = GetComponent<Rigidbody2D>();
         m_waveManager = FindObjectOfType<WaveManager>();
+        m_audioManager = FindObjectOfType<AudioManager>();
         GetMoneyText();
         GameManager.Instance.MaxFuel();
         m_fuel = GameManager.Instance.m_maxFuel;
@@ -140,7 +141,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if(m_bulletSpawnPoint != null)
         {
-
+            m_audioManager.PlaySFX(m_audioManager.m_shoot);
             if (m_bulletPowered == true)
             {
                 //Schiet een kogel af
